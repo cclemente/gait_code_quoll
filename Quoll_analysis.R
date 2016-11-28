@@ -2,6 +2,7 @@
 
 setwd("G:/Quoll gait paper")
 data5<-read.csv("quoll_surf_num_cali.csv")
+#test
 
 cols<-c("red","blue","green","pink")
 boxplot(SpC~X2, data=data5)
