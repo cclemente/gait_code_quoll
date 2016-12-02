@@ -1,4 +1,5 @@
 setwd("H:/quoll raw data")
+setwd("I:/Quoll gait paper")
 data1<-read.csv("Quoll_strides_averaged9.csv")
 GaitCY<-matrix(nrow = length(data1[,1]), ncol = 1)
 data1<-cbind(data1, GaitCY)
@@ -25,3 +26,4 @@ for (hh in 1:length(data1[,1])){
     }
 }
 
+write.csv(data1,"Quoll_strides_averaged10.csv")

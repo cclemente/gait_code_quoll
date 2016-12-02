@@ -1,12 +1,14 @@
 
 
-setwd("G:/Quoll gait paper")
-data5<-read.csv("quoll_surf_num_cali.csv")
+setwd("I:/Quoll gait paper")
+data5<-read.csv("quoll_surf_num_cali2.csv")
+plot(Speed~SpC,data=data5)
 #test
 
 cols<-c("red","blue","green","pink")
 boxplot(SpC~X2, data=data5)
-boxplot(SpC~Gait+X2,col=cols, data=data5)
+boxplot(SpC~GaitCY+X2,col=cols, data=data5)
+
 summary(fit<-aov(SpC~Gait+X2, data=data5))
 TukeyHSD(fit)
 
