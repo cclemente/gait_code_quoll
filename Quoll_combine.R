@@ -6,8 +6,9 @@ setwd("D:/project files/quoll paper/Analyse Quoll Gait")#clemente computer
 
 filenames <- (Sys.glob("*xypts.csv"))
 
-cvalues2= matrix(nrow = 0, ncol = 13)
-colnames(cvalues2)<-c('QuollRun', 'Cycle','Duration','Plag','Flag','Hlag', 'DF','DFH','DFF','Speed','Gait','sdh','sdf')
+cvalues2= matrix(nrow = 0, ncol = 17)
+#colnames(cvalues2)<-c('QuollRun', 'Cycle','Duration','Plag','Flag','Hlag', 'DF','DFH','DFF','Speed','Gait','sdh','sdf')
+colnames(cvalues2)<-c('QuollRun', 'Cycle','Duration','Plag','Flag','Hlag', 'DF','DFH','DFF','Speed','Gait','sdh','sdf','PlagM','FlagM','HlagM','GaitM')
 
 strides_out = matrix(nrow = 0, ncol = 9)
 colnames(strides_out)<-c("filename","Stride","Foot","FF" ,"ES","SubFF","DF","ES-FF","SubFF-FF")
@@ -35,8 +36,8 @@ cvalues2 = rbind(cvalues2, stff_out)
 #setwd("D:/project files/quoll paper")#clemente computer
 setwd("H:/quoll raw data/Quoll/quoll code")#josh usb
 #setwd("D:/Quoll/quoll code")#josh laptop
-write.csv(cvalues2,"Quoll_strides_averaged9.csv")
-write.csv(strides_out,"Quoll_steps_all9.csv")
+write.csv(cvalues2,"Quoll_strides_averaged11.csv")
+write.csv(strides_out,"Quoll_steps_all11.csv")
 
 
 

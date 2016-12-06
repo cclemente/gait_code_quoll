@@ -3,8 +3,8 @@ stff = function(filename, strides)
 
   {
 data5 <- read.csv(file=filename, header=TRUE, sep=",")
-cvalues= matrix(nrow = 0, ncol = 13)
-colnames(cvalues)<-c('QuollRun', 'Cycle','Duration','Plag','Flag','Hlag', 'DF','DFH','DFF','Speed','Gait','sdh','sdf')
+cvalues= matrix(nrow = 0, ncol = 17)
+colnames(cvalues)<-c('QuollRun', 'Cycle','Duration','Plag','Flag','Hlag', 'DF','DFH','DFF','Speed','Gait','sdh','sdf','PlagM','FlagM','HlagM','GaitM')
 #stridecyc = matrix(nrow = 0, ncol = 8)
 
 #find temporal stride variables
@@ -37,7 +37,9 @@ for (mm in 1:loopcount){
     cvalues[mm,2] <- mm
     #calculate Cycle Duration#
     stridecyc<-stridecyc[order(stridecyc[,2]),]
-    DurationC<-as.vector(stridecyc[,3:4])
+    DurationC<-as.vector(stridecyc[,3])
+    DurationF<-as.vector(stridecyc[,3:4])
+    DurationD<-as.vector(rowMeans(stridecyc[,3:4], na.rm=T))
     cvalues[mm,3] <- mean(stridecyc[,8],na.rm=T)#stride duration in frames
     
     
@@ -46,8 +48,15 @@ for (mm in 1:loopcount){
     cvalues[mm,5] <- abs(DurationC[3]-DurationC[4]) / as.numeric(cvalues[mm,3])#flag
     cvalues[mm,6] <- (DurationC[1]-DurationC[2]) / (as.numeric(cvalues[mm,3]))#hlag
     
-    if(as.numeric(cvalues[mm,5])>=0.5){cvalues[mm,5]<-1-as.numeric(cvalues[mm,5])}#flag logic if > 0.5
-    if(as.numeric(cvalues[mm,6])>=0.5){cvalues[mm,6]<-1-as.numeric(cvalues[mm,6])}#hlag logic if > 0.5
+    cvalues[mm,14] <- abs(DurationD[3]-DurationD[1]) / as.numeric(cvalues[mm,3])#plagM
+    cvalues[mm,15] <- abs(DurationD[3]-DurationD[4]) / as.numeric(cvalues[mm,3])#flagM
+    cvalues[mm,16] <- (DurationD[1]-DurationD[2]) / (as.numeric(cvalues[mm,3]))#hlagM
+    
+    if(!is.na(as.numeric(cvalues[mm,5]))&&as.numeric(cvalues[mm,5])>=0.5){cvalues[mm,5]<-1-as.numeric(cvalues[mm,5])}#flag logic if > 0.5
+    if(!is.na(as.numeric(cvalues[mm,6]))&&as.numeric(cvalues[mm,6])>=0.5){cvalues[mm,6]<-1-as.numeric(cvalues[mm,6])}#hlag logic if > 0.5   
+
+    if(!is.na(as.numeric(cvalues[mm,15]))&&as.numeric(cvalues[mm,15])>=0.5){cvalues[mm,15]<-1-as.numeric(cvalues[mm,15])}#flag logic if > 0.5
+    if(!is.na(as.numeric(cvalues[mm,16]))&&as.numeric(cvalues[mm,16])>=0.5){cvalues[mm,16]<-1-as.numeric(cvalues[mm,16])}#hlag logic if > 0.5
     
     #DutyFactor#
     cvalues[mm,7] <-mean(stridecyc[complete.cases(stridecyc[,6]),6])#gets average duty factor
@@ -86,15 +95,15 @@ for (mm in 1:loopcount){
     
     #Speed#
     
-    #which colum is speed? 
+    #which column is speed? 
     if (ncol(data5)==10) {
       sp_col<-9
     } else {
       sp_col<-17
     }
     
-    diffx <- diff(data5[min(DurationC):max(DurationC),sp_col])
-    diffy <- diff(data5[min(DurationC):max(DurationC),sp_col+1])
+    diffx <- diff(data5[min(DurationF):max(DurationF),sp_col])
+    diffy <- diff(data5[min(DurationF):max(DurationF),sp_col+1])
     dist_moved_per_frame<-sqrt((diffx^2)+(diffy^2))# in pixels
     Speed_vect<-dist_moved_per_frame*250 # in pixel/ sec
     mean_speed <- mean(Speed_vect,na.rm=TRUE)
@@ -103,6 +112,9 @@ for (mm in 1:loopcount){
     cvalues[mm,10] <- mean_speed
     
     ##Gait Patterns##
+    
+    if (!is.na(cvalues[mm,4]) && !is.na(cvalues[mm,5]) && !is.na(cvalues[mm,6])){
+    
     if (cvalues[mm,5]<=0.55 & cvalues[mm,5]>=0.45 & cvalues[mm,6]<=0.55 & cvalues[mm,6]>=0.45) {
       if (cvalues[mm,4]>=0.95){
         cvalues[mm,11]<-"Pace"
@@ -120,11 +132,11 @@ for (mm in 1:loopcount){
       } else if(cvalues[mm,6]<0 & cvalues[mm,4]>=0.02){
         cvalues[mm,11]<-"Rotary Gallop"
       } else if(cvalues[mm,6]<=0.05 & cvalues[mm,4]>=0.02){
-        cvalues[mm,11]<-"Half Bond"
+        cvalues[mm,11]<-"Half Bound"
       }
     } else if(cvalues[mm,5]<0.05){
       if (cvalues[mm,4]>=0.05){
-        cvalues[mm,11]<-"Bond"
+        cvalues[mm,11]<-"Bound"
       } else {
         cvalues[mm,11]<-"pronk"
       }
@@ -132,7 +144,48 @@ for (mm in 1:loopcount){
     } else{
       cvalues[mm,11]<-"Unknown"
     }
+    } else{
+      cvalues[mm,11]<-"Unknown"
+    } 
     #FF2
+    
+    ##GaitM Patterns##
+    
+    if (!is.na(cvalues[mm,14]) && !is.na(cvalues[mm,15]) && !is.na(cvalues[mm,16])){
+    
+    if (cvalues[mm,15]<=0.55 & cvalues[mm,15]>=0.45 & cvalues[mm,16]<=0.55 & cvalues[mm,16]>=0.45) {
+      if (cvalues[mm,14]>=0.95){
+        cvalues[mm,17]<-"Pace"
+      } else if(cvalues[mm,14]<=0.94999999 & cvalues[mm,14]>=0.55){
+        cvalues[mm,17]<-"Lateral Walk"
+      } else if (cvalues[mm,14]<=0.549999 & cvalues[mm,14]>=0.45){
+        cvalues[mm,17]<-"Trot"
+      } else if (cvalues[mm,14] <=0.449999){
+        cvalues[mm,17]<-"Diagonal Walk"
+      }
+      
+    } else  if(cvalues[mm,15]<=0.55 & cvalues[mm,15]>=0.05){
+      if (cvalues[mm,16]<=0.5 & cvalues[mm,16]>0.05){
+        cvalues[mm,17]<-"Transverse Gallop"
+      } else if(cvalues[mm,16]<0 & cvalues[mm,14]>=0.02){
+        cvalues[mm,17]<-"Rotary Gallop"
+      } else if(cvalues[mm,16]<=0.05 & cvalues[mm,14]>=0.02){
+        cvalues[mm,17]<-"Half Bound"
+      }
+    } else if(cvalues[mm,15]<0.05){
+      if (cvalues[mm,14]>=0.05){
+        cvalues[mm,17]<-"Bound"
+      } else {
+        cvalues[mm,17]<-"pronk"
+      }
+      
+    } else{
+      cvalues[mm,17]<-"Unknown"
+    }
+    }else{
+      cvalues[mm,17]<-"Unknown"
+    } 
+    
 }
 
 return(cvalues)

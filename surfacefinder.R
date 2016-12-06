@@ -1,5 +1,6 @@
 
-
+setwd("D:/project files/quoll paper")
+data1<-read.csv("Quoll_strides_averaged11.csv")
 
 QFSD<-matrix(nrow = length(data1$QuollRun), ncol = 3)
 QFSD[,1]<-as.character(data1$QuollRun)
@@ -16,13 +17,9 @@ for (xx in 1:length(QFSD[,1])) {
   }
 }
 data3<-cbind(data1,QFSD)
-setwd("G:/Quoll gait paper")
-write.csv(data3,"quoll_surf.csv")
+#setwd("G:/Quoll gait paper")
+write.csv(data3,"quoll_surf_11.csv")
 
-
-setwd("G:/Quoll gait paper")
-data1<-read.csv("Quoll_strides_averaged9.csv")
-data3<-read.csv("Quoll_strides_averaged9.csv")
 data2<-read.csv("name_key_quoll.csv")
 caliQ<-read.csv("cali_quoll.csv")
 
@@ -41,6 +38,6 @@ head(surf2)
 data5<-cbind(data3,surf2)
 
 setwd("G:/Quoll gait paper")
-write.csv(data5,"quoll_surf_num_cali.csv")
+write.csv(data5,"quoll_surf_num_cali_11.csv")
 
 
